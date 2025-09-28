@@ -54,3 +54,9 @@ site/
 google_ads_token.json
 
 uv.lock
+
+# Credentials for GCP
+# service account key, download it when you create the service account in GCP Console -> IAM & Admin -> Service Accounts -> Keys -> Add Key -> JSON
+service_account_key.json
+# OAuth client secret JSON key, download it when you create the OAuth client in GCP Console -> API & Services -> Credentials, after that you cannot download it again
+client_secret.json
