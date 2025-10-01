@@ -211,6 +211,8 @@ Choose Service Account if:
 
 Note: Initially, you'll get a test Developer Token that has some limitations. Once you've tested your implementation, you can apply for a production token that removes these restrictions.
 
+For more details, see the documentation on [Google Ads API Developer Tokens](https://developers.google.com/google-ads/api/docs/api-policy/developer-token).
+
 ### Understanding the Login Customer ID
 
 The `GOOGLE_ADS_LOGIN_CUSTOMER_ID` is optional and is primarily used when:
@@ -377,6 +379,7 @@ The application will automatically load these values from the `.env` file when i
 You can also set environment variables directly in your system or in the configuration files for Claude or Cursor:
 
 ##### For Claude Desktop
+Create a Claude Desktop config file with the following content:
 
 ```json
 {
@@ -394,6 +397,19 @@ You can also set environment variables directly in your system or in the configu
   }
 }
 ```
+
+For MacOS:
+```
+~/Library/Application Support/Claude/claude_desktop_config.json
+```
+
+For Windows:
+```
+%APPDATA%/Claude/claude_desktop_config.json
+```
+
+After updating the Claude Desktop config file, restart the Claude Desktop application.
+
 
 ##### For Cursor
 

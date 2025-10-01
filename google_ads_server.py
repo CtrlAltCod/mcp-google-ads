@@ -354,10 +354,19 @@ async def execute_gaql_query(
     except Exception as e:
         return f"Error executing GAQL query: {str(e)}"
 
+
+@mcp.tool()
+async def list_campaigns(
+    customer_id: str = Field(description="Google Ads customer ID (10 digits, no dashes). Example: '9873186703'"),
+) -> str:
+    """List all campaigns in the specified Google Ads account."""
+    return await execute_gaql_query(customer_id, "SELECT campaign.id, campaign.name FROM campaign")
+
+
 @mcp.tool()
 async def get_campaign_performance(
     customer_id: str = Field(description="Google Ads customer ID (10 digits, no dashes). Example: '9873186703'"),
-    days: int = Field(default=30, description="Number of days to look back (7, 30, 90, etc.)")
+    days: int = Field(default=7, description="Number of days to look back (7, 30, 90, etc.)")
 ) -> str:
     """
     Get campaign performance metrics for the specified time period.
@@ -403,7 +412,7 @@ async def get_campaign_performance(
 @mcp.tool()
 async def get_ad_performance(
     customer_id: str = Field(description="Google Ads customer ID (10 digits, no dashes). Example: '9873186703'"),
-    days: int = Field(default=30, description="Number of days to look back (7, 30, 90, etc.)")
+    days: int = Field(default=7, description="Number of days to look back (7, 30, 90, etc.)")
 ) -> str:
     """
     Get ad performance metrics for the specified time period.

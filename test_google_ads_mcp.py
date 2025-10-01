@@ -44,33 +44,40 @@ async def test_mcp_tools():
     print("=== Testing list_accounts ===")
     accounts_result = await google_ads_server.list_accounts()
     print(accounts_result)
+
+    # hardcode managercustomer ID
+    manager_customer_id = "2857151978"
     
     # Parse the accounts to extract a customer ID for further tests
-    customer_id = None
+    non_manager_customer_ids = []
     for line in accounts_result.split('\n'):
         if line.startswith("Account ID:"):
-            customer_id = line.replace("Account ID:", "").strip()
-            break
+            non_manager_customer_id = line.replace("Account ID:", "").strip()
+            if non_manager_customer_id != manager_customer_id:
+                non_manager_customer_ids.append(non_manager_customer_id)
+
     
-    if not customer_id:
-        print("No customer IDs found. Cannot continue testing.")
-        return
+    print(f"\nUsing manager customer ID: {manager_customer_id} for testing\n")
+    print(f"\nUsing non-manager customer IDs: {non_manager_customer_ids} for testing\n")
     
-    print(f"\nUsing customer ID: {customer_id} for testing\n")
-    
+    # Test list campaigns
+    print("\n=== Testing list_campaigns ===")
+    campaigns_result = await google_ads_server.list_campaigns(manager_customer_id)
+    print(campaigns_result)
+
     # Test campaign performance
     print("\n=== Testing get_campaign_performance ===")
-    campaign_result = await google_ads_server.get_campaign_performance(customer_id, days=90)
+    campaign_result = await google_ads_server.get_campaign_performance(manager_customer_id, days=7)
     print(campaign_result)
     
     # Test ad performance
     print("\n=== Testing get_ad_performance ===")
-    ad_result = await google_ads_server.get_ad_performance(customer_id, days=90)
+    ad_result = await google_ads_server.get_ad_performance(manager_customer_id, days=7)
     print(ad_result)
     
     # Test ad creatives
     print("\n=== Testing get_ad_creatives ===")
-    creatives_result = await google_ads_server.get_ad_creatives(customer_id)
+    creatives_result = await google_ads_server.get_ad_creatives(manager_customer_id)
     print(creatives_result)
     
     # Test custom GAQL query
@@ -83,7 +90,7 @@ async def test_mcp_tools():
         FROM campaign 
         LIMIT 5
     """
-    gaql_result = await google_ads_server.run_gaql(customer_id, query, format="json")
+    gaql_result = await google_ads_server.run_gaql(manager_customer_id, query, format="json")
     print(gaql_result)
 
 async def test_asset_methods():
@@ -91,23 +98,24 @@ async def test_asset_methods():
     # Get a list of available customer IDs first
     print("=== Testing Asset Methods ===")
     accounts_result = await google_ads_server.list_accounts()
+
+    # hardcode managercustomer ID
+    manager_customer_id = "2857151978"
     
     # Parse the accounts to extract a customer ID for further tests
-    customer_id = None
+    non_manager_customer_ids = []
     for line in accounts_result.split('\n'):
         if line.startswith("Account ID:"):
-            customer_id = line.replace("Account ID:", "").strip()
-            break
+            non_manager_customer_id = line.replace("Account ID:", "").strip()
+            if non_manager_customer_id != manager_customer_id:
+                non_manager_customer_ids.append(non_manager_customer_id)
     
-    if not customer_id:
-        print("No customer IDs found. Cannot continue testing.")
-        return
-    
-    print(f"\nUsing customer ID: {customer_id} for testing asset methods\n")
+    print(f"\nUsing manager customer ID: {manager_customer_id} for testing asset methods\n")
+    print(f"Using non-manager customer IDs: {non_manager_customer_ids} for testing asset methods\n")
     
     # Test get_image_assets
     print("\n=== Testing get_image_assets ===")
-    image_assets_result = await google_ads_server.get_image_assets(customer_id, limit=10)
+    image_assets_result = await google_ads_server.get_image_assets(manager_customer_id, limit=10)
     print(image_assets_result)
     
     # Extract an asset ID for further testing if available
@@ -124,7 +132,7 @@ async def test_asset_methods():
     if asset_id:
         print(f"\n=== Testing get_asset_usage with asset ID: {asset_id} ===")
         try:
-            asset_usage_result = await google_ads_server.get_asset_usage(customer_id, asset_id=asset_id, asset_type="IMAGE")
+            asset_usage_result = await google_ads_server.get_asset_usage(manager_customer_id, asset_id=asset_id, asset_type="IMAGE")
             print(asset_usage_result)
         except Exception as e:
             print(f"Error in get_asset_usage: {str(e)}")
@@ -134,7 +142,7 @@ async def test_asset_methods():
     # Test analyze_image_assets with a valid date range
     print(f"\n=== Testing analyze_image_assets with {days_to_test} days ===")
     try:
-        analyze_result = await google_ads_server.analyze_image_assets(customer_id, days=days_to_test)
+        analyze_result = await google_ads_server.analyze_image_assets(manager_customer_id, days=days_to_test)
         print(analyze_result)
     except Exception as e:
         print(f"Error in analyze_image_assets: {str(e)}")
@@ -152,7 +160,7 @@ if __name__ == "__main__":
         os.environ["GOOGLE_ADS_CLIENT_SECRET"] = "YOUR_CLIENT_SECRET"  # Replace with placeholder
     
     # Run the MCP tools test (uncomment to run full tests)
-    # asyncio.run(test_mcp_tools())
+    asyncio.run(test_mcp_tools())
     
     # Run the asset methods test (uncomment to run full tests)
     asyncio.run(test_asset_methods())
