@@ -42,7 +42,7 @@ async def test_mcp_tools():
     """Test Google Ads MCP tools directly."""
     # Get a list of available customer IDs first
     print("=== Testing list_accounts ===")
-    accounts_result = await google_ads_server.list_accounts()
+    accounts_result = await google_ads_server.list_accounts_by_api()
     print(accounts_result)
 
     # hardcode managercustomer ID
@@ -59,45 +59,58 @@ async def test_mcp_tools():
     
     print(f"\nUsing manager customer ID: {manager_customer_id} for testing\n")
     print(f"\nUsing non-manager customer IDs: {non_manager_customer_ids} for testing\n")
-    
-    # Test list campaigns
-    print("\n=== Testing list_campaigns ===")
-    campaigns_result = await google_ads_server.list_campaigns(manager_customer_id)
-    print(campaigns_result)
 
-    # Test campaign performance
-    print("\n=== Testing get_campaign_performance ===")
-    campaign_result = await google_ads_server.get_campaign_performance(manager_customer_id, days=7)
-    print(campaign_result)
+    # Test list accounts by gaql
+    print("\n=== Testing list_customer_accounts_by_gaql ===")
+    accounts_result = await google_ads_server.list_customer_accounts_by_gaql(manager_customer_id)
+    print(accounts_result)
+
+    # Test list campaigns for a customer account
+    print("\n=== Testing list_customer_campaigns_by_gaql ===")
+    customer_account_id = "9711179739"
+    campaigns_result = await google_ads_server.list_customer_campaigns_by_gaql(customer_account_id)
+    print(campaigns_result)
     
-    # Test ad performance
-    print("\n=== Testing get_ad_performance ===")
-    ad_result = await google_ads_server.get_ad_performance(manager_customer_id, days=7)
-    print(ad_result)
+    # # # Test list campaigns
+    # # print("\n=== Testing list_campaigns ===")
+    # # campaigns_result = await google_ads_server.list_campaigns_by_qaql(manager_customer_id)
+    # # # campaigns_result = await google_ads_server.list_campaigns_by_qaql("9711179739")
+    # # print(campaigns_result)
+
+    # # Test campaign performance
+    # print("\n=== Testing get_campaign_performance ===")
+    # campaign_result = await google_ads_server.get_campaign_performance(manager_customer_id, days=7)
+    # print(campaign_result)
     
-    # Test ad creatives
-    print("\n=== Testing get_ad_creatives ===")
-    creatives_result = await google_ads_server.get_ad_creatives(manager_customer_id)
-    print(creatives_result)
+    # # Test ad performance
+    # print("\n=== Testing get_ad_performance ===")
+    # ad_result = await google_ads_server.get_ad_performance(manager_customer_id, days=7)
+    # print(ad_result)
     
-    # Test custom GAQL query
-    print("\n=== Testing run_gaql ===")
-    query = """
-        SELECT 
-            campaign.id, 
-            campaign.name, 
-            campaign.status 
-        FROM campaign 
-        LIMIT 5
-    """
-    gaql_result = await google_ads_server.run_gaql(manager_customer_id, query, format="json")
-    print(gaql_result)
+    # # Test ad creatives
+    # print("\n=== Testing get_ad_creatives ===")
+    # creatives_result = await google_ads_server.get_ad_creatives(manager_customer_id)
+    # print(creatives_result)
+    
+    # # Test custom GAQL query
+    # print("\n=== Testing run_gaql ===")
+    # query = """
+    #     SELECT 
+    #         campaign.id, 
+    #         campaign.name, 
+    #         campaign.status 
+    #     FROM campaign 
+    #     LIMIT 5
+    # """
+    # gaql_result = await google_ads_server.run_gaql(manager_customer_id, query, format="json")
+    # print(gaql_result)
+
 
 async def test_asset_methods():
     """Test Asset-related MCP tools directly."""
     # Get a list of available customer IDs first
     print("=== Testing Asset Methods ===")
-    accounts_result = await google_ads_server.list_accounts()
+    accounts_result = await google_ads_server.list_accounts_by_api()
 
     # hardcode managercustomer ID
     manager_customer_id = "2857151978"
@@ -163,4 +176,4 @@ if __name__ == "__main__":
     asyncio.run(test_mcp_tools())
     
     # Run the asset methods test (uncomment to run full tests)
-    asyncio.run(test_asset_methods())
+    # asyncio.run(test_asset_methods())

@@ -243,7 +243,7 @@ def get_headers(creds):
     return headers
 
 @mcp.tool()
-async def list_accounts() -> str:
+async def list_accounts_by_api() -> str:
     """
     Lists all accessible Google Ads accounts.
     
@@ -281,6 +281,58 @@ async def list_accounts() -> str:
     except Exception as e:
         return f"Error listing accounts: {str(e)}"
 
+
+@mcp.tool()
+async def list_customer_accounts_by_gaql(
+    customer_id: str = Field(description="Google Ads manager customer ID (10 digits, no dashes). Example: '9873186703'"),
+) -> str:
+    """
+    Lists all accessible Google Ads accounts for a manager account.
+    
+    Returns:
+        A formatted list of all Google Ads accounts accessible with manager credentials
+    """
+    query = """
+    SELECT
+        customer_client.id,
+        customer_client.descriptive_name,
+        customer_client.manager,
+        customer_client.status,
+        customer_client.currency_code,
+        customer_client.time_zone
+    FROM customer_client
+    WHERE customer_client.manager = FALSE
+    """
+    return await execute_gaql_query(customer_id, query)
+
+@mcp.tool()
+async def list_customer_campaigns_by_gaql(
+    customer_id: str = Field(description="Google Ads customer ID (10 digits, no dashes). Example: '9873186703'"),
+) -> str:
+    """
+    Lists all campaigns for a specific customer.
+    
+    Returns:
+        A formatted list of all campaigns for the specified customer
+    """
+    query = """
+        SELECT
+            campaign.id,
+            campaign.name,
+            campaign.status,
+            campaign.advertising_channel_type,
+            campaign.bidding_strategy_type,
+            campaign.start_date,
+            campaign.end_date,
+            metrics.impressions,
+            metrics.clicks,
+            metrics.cost_micros
+        FROM campaign
+        WHERE segments.date DURING LAST_30_DAYS
+        ORDER BY campaign.id
+    """
+    return await execute_gaql_query(customer_id, query)
+
 @mcp.tool()
 async def execute_gaql_query(
     customer_id: str = Field(description="Google Ads customer ID (10 digits, no dashes). Example: '9873186703'"),
@@ -303,6 +355,9 @@ async def execute_gaql_query(
         query: "SELECT campaign.id, campaign.name FROM campaign LIMIT 10"
     """
     try:
+        logger.info(f"Using customer ID: {customer_id}")
+        logger.info(f"Using query: {query}")
+
         creds = get_credentials()
         headers = get_headers(creds)
         
@@ -356,7 +411,7 @@ async def execute_gaql_query(
 
 
 @mcp.tool()
-async def list_campaigns(
+async def list_campaigns_by_qaql(
     customer_id: str = Field(description="Google Ads customer ID (10 digits, no dashes). Example: '9873186703'"),
 ) -> str:
     """List all campaigns in the specified Google Ads account."""
