@@ -331,7 +331,7 @@ async def list_customer_campaigns_by_gaql(
         WHERE segments.date DURING LAST_30_DAYS
         ORDER BY campaign.id
     """
-    return await execute_gaql_query(customer_id, query)
+    return await run_gaql(customer_id, query, 'json')
 
 @mcp.tool()
 async def execute_gaql_query(
